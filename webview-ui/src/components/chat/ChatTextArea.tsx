@@ -2,6 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, us
 import DynamicTextArea from "react-textarea-autosize"
 import { mentionRegex, mentionRegexGlobal } from "../../../../src/shared/context-mentions"
 import { useExtensionState } from "../../context/ExtensionStateContext"
+import { vscode } from "../../utils/vscode"
 import {
 	ContextMenuOptionType,
 	getContextMenuOptions,
@@ -57,6 +58,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const [justDeletedSpaceAfterMention, setJustDeletedSpaceAfterMention] = useState(false)
 		const [intendedCursorPosition, setIntendedCursorPosition] = useState<number | null>(null)
 		const contextMenuContainerRef = useRef<HTMLDivElement>(null)
+		const [autoApprove, setAutoApprove] = useState(false)
 
 		const queryItems = useMemo(() => {
 			return [
@@ -568,6 +570,17 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						zIndex: 2,
 					}}>
 					<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+						<div
+							className={`input-icon-button codicon ${autoApprove ? 'codicon-sync' : 'codicon-sync-ignored'}`}
+							onClick={() => {
+								vscode.postMessage({ type: "allowAutoApprove", bool: !autoApprove })
+								setAutoApprove(!autoApprove);
+							}}
+							style={{
+								marginRight: 5.5,
+								fontSize: 16.5,
+							}}
+						/>
 						<div
 							className={`input-icon-button ${
 								shouldDisableImages ? "disabled" : ""
