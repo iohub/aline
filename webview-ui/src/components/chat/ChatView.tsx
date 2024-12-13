@@ -1,4 +1,4 @@
-import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
+import { VSCodeButton, VSCodeLink, VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react"
 import debounce from "debounce"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useDeepCompareEffect, useEvent, useMount } from "react-use"
@@ -674,6 +674,9 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 		[expandedRows, modifiedMessages, groupedMessages.length, toggleRowExpansion, handleRowHeightChange],
 	)
 
+	// Add new state for dropdowns
+	const [selectedModel, setSelectedModel] = useState("Claude 3.5 Sonnet (New)")
+
 	return (
 		<div
 			style={{
@@ -824,6 +827,44 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					}
 				}}
 			/>
+
+			{/* Add new control bar */}
+			<div style={{
+				display: "flex",
+				padding: "8px 15px",
+				gap: "8px",
+				borderTop: "1px solid var(--vscode-input-border)",
+				backgroundColor: "var(--vscode-input-background)",
+			}}>
+				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+					<i className="codicon codicon-symbol-namespace" style={{ fontSize: "14px", opacity: 0.8 }} />
+					<span style={{ opacity: 0.8 }}>Context</span>
+				</div>
+
+				<div style={{ 
+					height: "18px", 
+					width: "1px", 
+					backgroundColor: "var(--vscode-input-border)",
+					margin: "0 4px"
+				}} />
+
+				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+					<span style={{ opacity: 0.8 }}>Prompts</span>
+					<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
+				</div>
+
+				<div style={{ 
+					height: "18px", 
+					width: "1px", 
+					backgroundColor: "var(--vscode-input-border)",
+					margin: "0 4px"
+				}} />
+
+				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+					<span style={{ opacity: 0.8 }}>{selectedModel}</span>
+					<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
+				</div>
+			</div>
 		</div>
 	)
 }
