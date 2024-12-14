@@ -37,10 +37,9 @@ const SystemPromptPicker = ({ selectedPrompt, onSelect }: SystemPromptProps) => 
   }, [])
 
   const handleEditRole = () => {
-    const promptFile = path.join(os.homedir(), ".cline", "system_prompts.json")
     vscode.postMessage({
       type: "openFile",
-      text: promptFile
+      text: "{SystemPromptFile}"
     })
     setIsOpen(false)
   }

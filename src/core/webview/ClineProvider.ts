@@ -1,6 +1,7 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import axios from "axios"
 import fs from "fs/promises"
+import os from "os"
 import pWaitFor from "p-wait-for"
 import * as path from "path"
 import * as vscode from "vscode"
@@ -495,7 +496,12 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						break
 					case "openFile": {
 						if (message.text) {
-							const document = await vscode.workspace.openTextDocument(vscode.Uri.file(message.text))
+							let file = message.text
+							if (message.text === "{SystemPromptFile}") {
+								file = path.join(os.homedir(), ".cline", "system_prompts.json")
+							}
+							console.log("openFile", file)
+							const document = await vscode.workspace.openTextDocument(vscode.Uri.file(file))
 							await vscode.window.showTextDocument(document)
 						}
 						break
