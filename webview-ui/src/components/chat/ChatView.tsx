@@ -810,60 +810,56 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					)}
 				</>
 			)}
-			<ChatTextArea
-				ref={textAreaRef}
-				inputValue={inputValue}
-				setInputValue={setInputValue}
-				textAreaDisabled={textAreaDisabled}
-				placeholderText={placeholderText}
-				selectedImages={selectedImages}
-				setSelectedImages={setSelectedImages}
-				onSend={() => handleSendMessage(inputValue, selectedImages)}
-				onSelectImages={selectImages}
-				shouldDisableImages={shouldDisableImages}
-				onHeightChange={() => {
-					if (isAtBottom) {
-						scrollToBottomAuto()
-					}
-				}}
-			/>
+			<div style={{ display: "flex", flexDirection: "column" }}>
+				<div style={{
+					display: "flex",
+					padding: "8px 15px 0 15px", // Adjust padding to be closer to input
+					gap: "8px",
+					backgroundColor: "var(--vscode-input-background)",
+				}}>
 
-			{/* Add new control bar */}
-			<div style={{
-				display: "flex",
-				padding: "8px 15px",
-				gap: "8px",
-				borderTop: "1px solid var(--vscode-input-border)",
-				backgroundColor: "var(--vscode-input-background)",
-			}}>
-				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-					<i className="codicon codicon-symbol-namespace" style={{ fontSize: "14px", opacity: 0.8 }} />
-					<span style={{ opacity: 0.8 }}>Context</span>
+					<div style={{ 
+						height: "18px", 
+						width: "1px", 
+						backgroundColor: "var(--vscode-input-border)",
+						margin: "0 4px"
+					}} />
+
+					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+						<span style={{ opacity: 0.8 }}>Prompts</span>
+						<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
+					</div>
+
+					<div style={{ 
+						height: "18px", 
+						width: "1px", 
+						backgroundColor: "var(--vscode-input-border)",
+						margin: "0 4px"
+					}} />
+
+					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+						<span style={{ opacity: 0.8 }}>{selectedModel}</span>
+						<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
+					</div>
 				</div>
 
-				<div style={{ 
-					height: "18px", 
-					width: "1px", 
-					backgroundColor: "var(--vscode-input-border)",
-					margin: "0 4px"
-				}} />
-
-				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-					<span style={{ opacity: 0.8 }}>Prompts</span>
-					<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
-				</div>
-
-				<div style={{ 
-					height: "18px", 
-					width: "1px", 
-					backgroundColor: "var(--vscode-input-border)",
-					margin: "0 4px"
-				}} />
-
-				<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-					<span style={{ opacity: 0.8 }}>{selectedModel}</span>
-					<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
-				</div>
+				<ChatTextArea
+					ref={textAreaRef}
+					inputValue={inputValue}
+					setInputValue={setInputValue}
+					textAreaDisabled={textAreaDisabled}
+					placeholderText={placeholderText}
+					selectedImages={selectedImages}
+					setSelectedImages={setSelectedImages}
+					onSend={() => handleSendMessage(inputValue, selectedImages)}
+					onSelectImages={selectImages}
+					shouldDisableImages={shouldDisableImages}
+					onHeightChange={() => {
+						if (isAtBottom) {
+							scrollToBottomAuto()
+						}
+					}}
+				/>
 			</div>
 		</div>
 	)
