@@ -15,6 +15,7 @@ interface ModelPickerProps {
 const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
 
   const models: ModelOption[] = [
     { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
@@ -26,7 +27,8 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -36,8 +38,8 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
   }, [])
 
   return (
-    <Container ref={dropdownRef}>
-      <ModelButton onClick={() => setIsOpen(!isOpen)}>
+    <Container>
+      <ModelButton ref={buttonRef} onClick={() => setIsOpen(!isOpen)}>
         <CubeIcon className="codicon codicon-package" />
         <span style={{ opacity: 0.8 }}>{selectedModel}</span>
         <ChevronIcon 
@@ -46,7 +48,7 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
       </ModelButton>
 
       {isOpen && (
-        <DropdownMenu>
+        <DropdownMenu ref={dropdownRef}>
           <KeyboardShortcut>⌘ + ' to toggle</KeyboardShortcut>
           {models.map((model) => (
             <MenuItem
@@ -75,6 +77,7 @@ const Container = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
 `
 
 const ModelButton = styled.div`
@@ -84,6 +87,7 @@ const ModelButton = styled.div`
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 3px;
+  white-space: nowrap;
   
   &:hover {
     background-color: var(--vscode-toolbar-hoverBackground);
@@ -91,18 +95,19 @@ const ModelButton = styled.div`
 `
 
 const DropdownMenu = styled.div`
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 4px;
+  position: fixed;
+  z-index: 1000;
+  min-width: 260px;
   background-color: var(--vscode-dropdown-background);
   border: 1px solid var(--vscode-dropdown-border);
   border-radius: 3px;
-  min-width: 260px;
-  z-index: 1000;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column-reverse;
+
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 45px;
 `
 
 const MenuItem = styled.div`
