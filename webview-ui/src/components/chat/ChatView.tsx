@@ -24,6 +24,7 @@ import BrowserSessionRow from "./BrowserSessionRow"
 import ChatRow from "./ChatRow"
 import ChatTextArea from "./ChatTextArea"
 import TaskHeader from "./TaskHeader"
+import ModelPicker from './ModelPicker'
 
 interface ChatViewProps {
 	isHidden: boolean
@@ -815,7 +816,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					display: "flex",
 					padding: "8px 15px 0 15px", // Adjust padding to be closer to input
 					gap: "8px",
-					backgroundColor: "var(--vscode-input-background)",
+					backgroundColor: "transparent",
 				}}>
 
 					<div style={{ 
@@ -837,10 +838,10 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 						margin: "0 4px"
 					}} />
 
-					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-						<span style={{ opacity: 0.8 }}>{selectedModel}</span>
-						<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
-					</div>
+					<ModelPicker
+						selectedModel={selectedModel}
+						onModelSelect={setSelectedModel}
+					/>
 				</div>
 
 				<ChatTextArea
