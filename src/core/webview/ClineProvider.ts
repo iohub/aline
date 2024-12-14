@@ -471,7 +471,11 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						openImage(message.text!)
 						break
 					case "openFile":
-						openFile(message.text!)
+						let file = message.text
+						if (message.text === "{SystemPromptFile}") {
+							file = path.join(os.homedir(), ".cline", "system_prompts.json")
+						}
+						openFile(file!)
 						break
 					case "openMention":
 						openMention(message.text)
@@ -494,18 +498,6 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						}
 
 						break
-					case "openFile": {
-						if (message.text) {
-							let file = message.text
-							if (message.text === "{SystemPromptFile}") {
-								file = path.join(os.homedir(), ".cline", "system_prompts.json")
-							}
-							console.log("openFile", file)
-							const document = await vscode.workspace.openTextDocument(vscode.Uri.file(file))
-							await vscode.window.showTextDocument(document)
-						}
-						break
-					}
 					// Add more switch case statements here as more webview message commands
 					// are created within the webview context (i.e. inside media/main.js)
 				}

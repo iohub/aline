@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { vscode } from "../../utils/vscode"
-import path from 'path'
-import * as os from 'os'
 
 interface PromptOption {
   id: string
