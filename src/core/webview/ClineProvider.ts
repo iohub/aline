@@ -493,6 +493,13 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						}
 
 						break
+					case "openFile": {
+						if (message.text) {
+							const document = await vscode.workspace.openTextDocument(vscode.Uri.file(message.text))
+							await vscode.window.showTextDocument(document)
+						}
+						break
+					}
 					// Add more switch case statements here as more webview message commands
 					// are created within the webview context (i.e. inside media/main.js)
 				}

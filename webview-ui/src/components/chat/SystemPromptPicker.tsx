@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
+import { vscode } from "../../utils/vscode"
+import path from 'path'
+import * as os from 'os'
 
 interface PromptOption {
   id: string
@@ -33,6 +36,15 @@ const SystemPromptPicker = ({ selectedPrompt, onSelect }: SystemPromptProps) => 
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleEditRole = () => {
+    const promptFile = path.join(os.homedir(), ".cline", "system_prompts.json")
+    vscode.postMessage({
+      type: "openFile",
+      text: promptFile
+    })
+    setIsOpen(false)
+  }
+
   return (
     <Container>
       <ModelButton ref={buttonRef} onClick={() => setIsOpen(!isOpen)}>
@@ -59,7 +71,11 @@ const SystemPromptPicker = ({ selectedPrompt, onSelect }: SystemPromptProps) => 
           <Divider />
           <MenuItem>
             <PlusIcon className="codicon codicon-plus" />
-            <span>Add System prompt</span>
+            <span>Add role</span>
+          </MenuItem>
+          <MenuItem onClick={handleEditRole}>
+            <PlusIcon className="codicon codicon-edit" />
+            <span>Edit role</span>
           </MenuItem>
         </DropdownMenu>
       )}
