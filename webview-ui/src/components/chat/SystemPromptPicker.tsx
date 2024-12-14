@@ -1,28 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 
-interface ModelOption {
+interface PromptOption {
   id: string
   name: string
-  status?: string
 }
 
-interface ModelPickerProps {
-  selectedModel: string
-  onModelSelect: (model: string) => void
+interface SystemPromptProps {
+  selectedPrompt: string
+  onSelect: (model: string) => void
 }
 
-const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
+const SystemPromptPicker = ({ selectedPrompt, onSelect }: SystemPromptProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLDivElement>(null)
 
-  const models: ModelOption[] = [
-    { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
-    { id: 'gpt4o', name: 'GPT-4o' },
-    { id: 'llama-70b-free', name: 'Llama3.1 70b' },
-    { id: 'codestral-free', name: 'Codestral' },
-    { id: 'claude-3-sonnet', name: 'Claude 3.5 Sonnet', status: 'Missing API key' },
+  const models: PromptOption[] = [
+    { id: 'cline-default', name: 'Cline' },
+    { id: 'chatbot', name: 'Chatbot' },
   ]
 
   useEffect(() => {
@@ -40,8 +36,8 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
   return (
     <Container>
       <ModelButton ref={buttonRef} onClick={() => setIsOpen(!isOpen)}>
-        <CubeIcon className="codicon codicon-package" />
-        <span style={{ opacity: 0.8 }}>{selectedModel}</span>
+        <CubeIcon className="codicon codicon-json" />
+        <span style={{ opacity: 0.8 }}>{selectedPrompt}</span>
         <ChevronIcon 
           className={`codicon codicon-chevron-${isOpen ? 'up' : 'down'}`} 
         />
@@ -53,18 +49,17 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
             <MenuItem
               key={model.id}
               onClick={() => {
-                onModelSelect(model.name)
+                onSelect(model.name)
                 setIsOpen(false)
               }}>
-              <CubeIcon className="codicon codicon-package" />
+              <CubeIcon className="codicon codicon-json" />
               <ModelName>{model.name}</ModelName>
-              {model.status && <StatusText>({model.status})</StatusText>}
             </MenuItem>
           ))}
           <Divider />
           <MenuItem>
             <PlusIcon className="codicon codicon-plus" />
-            <span>Add Chat model</span>
+            <span>Add System prompt</span>
           </MenuItem>
         </DropdownMenu>
       )}
@@ -104,7 +99,7 @@ const DropdownMenu = styled.div`
   display: flex;
   flex-direction: column-reverse;
 
-  left: 50%;
+  left: 30%;
   transform: translateX(-50%);
   bottom: 45px;
 `
@@ -125,11 +120,6 @@ const ModelName = styled.span`
   flex-grow: 1;
 `
 
-const StatusText = styled.span`
-  color: var(--vscode-descriptionForeground);
-  font-style: italic;
-`
-
 const CubeIcon = styled.i`
   font-size: 14px;
   opacity: 0.8;
@@ -148,16 +138,6 @@ const PlusIcon = styled.i`
 const Divider = styled.div`
   height: 1px;
   background-color: var(--vscode-dropdown-border);
-  margin: 4px 0;
 `
 
-const KeyboardShortcut = styled.div`
-  padding: 4px 12px;
-  color: var(--vscode-descriptionForeground);
-  font-size: 12px;
-  background-color: var(--vscode-dropdown-listBackground);
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-`
-
-export default ModelPicker 
+export default SystemPromptPicker 

@@ -25,6 +25,7 @@ import ChatRow from "./ChatRow"
 import ChatTextArea from "./ChatTextArea"
 import TaskHeader from "./TaskHeader"
 import ModelPicker from './ModelPicker'
+import SystemPromptPicker from "./SystemPromptPicker"
 
 interface ChatViewProps {
 	isHidden: boolean
@@ -677,7 +678,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 
 	// Add new state for dropdowns
 	const [selectedModel, setSelectedModel] = useState("Claude 3.5 Sonnet (New)")
-
+	const [selectedPrompt, setSelectedPrompt] = useState("Cline")
 	return (
 		<div
 			style={{
@@ -827,8 +828,10 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					}} />
 
 					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-						<span style={{ opacity: 0.8 }}>Prompts</span>
-						<i className="codicon codicon-chevron-down" style={{ fontSize: "12px", opacity: 0.8 }} />
+						<SystemPromptPicker
+							selectedPrompt={selectedPrompt}
+							onSelect={setSelectedPrompt}
+						/>
 					</div>
 
 					<div style={{ 
