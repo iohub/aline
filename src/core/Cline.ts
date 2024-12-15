@@ -47,6 +47,7 @@ import { truncateHalfConversation } from "./sliding-window"
 import { ClineProvider, GlobalFileNames } from "./webview/ClineProvider"
 import { showOmissionWarning } from "../integrations/editor/detect-omission"
 import { BrowserSession } from "../services/browser/BrowserSession"
+import { CLINE_SYSTEM_PROMPT, SystemPrompt } from "../shared/SystemPrompt"
 
 const cwd =
 	vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath).at(0) ?? path.join(os.homedir(), "Desktop") // may or may not exist but fs checking existence would immediately ask for permission which would be bad UX, need to come up with a better solution
@@ -68,6 +69,7 @@ export class Cline {
 	allowAutoApprove: boolean
 	apiConversationHistory: Anthropic.MessageParam[] = []
 	clineMessages: ClineMessage[] = []
+	systemPrompt: SystemPrompt
 	private askResponse?: ClineAskResponse
 	private askResponseText?: string
 	private askResponseImages?: string[]
@@ -109,6 +111,8 @@ export class Cline {
 		this.customInstructions = customInstructions
 		this.alwaysAllowReadOnly = alwaysAllowReadOnly ?? false
 		this.allowAutoApprove = allowAutoApprove ?? false
+		this.systemPrompt = CLINE_SYSTEM_PROMPT
+
 		if (historyItem) {
 			this.taskId = historyItem.id
 			this.resumeTaskFromHistory()
@@ -753,7 +757,11 @@ export class Cline {
 	}
 
 	async *attemptApiRequest(previousApiReqIndex: number): ApiStream {
-		let systemPrompt = await SYSTEM_PROMPT(cwd, this.api.getModel().info.supportsComputerUse ?? false)
+	
+		let systemPrompt = this.systemPrompt.id === "cline" ?
+			 await SYSTEM_PROMPT(cwd, this.api.getModel().info.supportsComputerUse ?? false) :
+			 this.systemPrompt.prompt
+
 		if (this.customInstructions && this.customInstructions.trim()) {
 			// altering the system prompt mid-task will break the prompt cache, but in the grand scheme this will not change often so it's better to not pollute user messages with it the way we have to with <potentially relevant details>
 			systemPrompt += addCustomInstructions(this.customInstructions)
