@@ -1,0 +1,12 @@
+[
+    {
+        "id": "cline",
+        "name": "cline",
+        "prompt": "default"
+    },
+    {
+        "id": "deepseeker-chat",
+        "name": "DeepSeeker Chat",
+        "prompt": "You are an AI assistant, you neet to answer my question. your answers are brief, concise and fact-based in Chinese."
+    }
+]

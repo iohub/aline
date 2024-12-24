@@ -4,6 +4,7 @@ import { ApiConfiguration, ModelInfo } from "./api"
 import { AutoApprovalSettings } from "./AutoApprovalSettings"
 import { HistoryItem } from "./HistoryItem"
 import { McpServer } from "./mcp"
+import { SystemPrompt } from "./SystemPrompt"
 
 // webview will hold state
 export interface ExtensionMessage {
@@ -44,6 +45,7 @@ export interface ExtensionState {
 	uriScheme?: string
 	clineMessages: ClineMessage[]
 	taskHistory: HistoryItem[]
+	systemPrompts: SystemPrompt[]
 	shouldShowAnnouncement: boolean
 	autoApprovalSettings: AutoApprovalSettings
 }
