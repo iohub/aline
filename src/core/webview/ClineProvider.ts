@@ -23,6 +23,7 @@ import { openMention } from "../mentions"
 import { getNonce } from "./getNonce"
 import { getUri } from "./getUri"
 import { AutoApprovalSettings, DEFAULT_AUTO_APPROVAL_SETTINGS } from "../../shared/AutoApprovalSettings"
+import { SystemPrompt } from "../../shared/SystemPrompt"
 
 /*
 https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/providers/WeatherViewProvider.ts
@@ -60,6 +61,8 @@ type GlobalStateKey =
 	| "openRouterModelId"
 	| "openRouterModelInfo"
 	| "autoApprovalSettings"
+	| "systemPrompts"
+	| "systemPrompt"
 
 export const GlobalFileNames = {
 	apiConversationHistory: "api_conversation_history.json",
@@ -67,6 +70,7 @@ export const GlobalFileNames = {
 	openRouterModels: "openrouter_models.json",
 	mcpSettings: "cline_mcp_settings.json",
 	clineRules: ".clinerules",
+	systemPrompts: "system_prompts.json",
 }
 
 export class ClineProvider implements vscode.WebviewViewProvider {
@@ -200,13 +204,13 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 
 	async initClineWithTask(task?: string, images?: string[]) {
 		await this.clearTask() // ensures that an exising task doesn't exist before starting a new one, although this shouldn't be possible since user must clear task before starting a new one
-		const { apiConfiguration, customInstructions, autoApprovalSettings } = await this.getState()
-		this.cline = new Cline(this, apiConfiguration, autoApprovalSettings, customInstructions, task, images)
+		const { apiConfiguration, customInstructions, autoApprovalSettings, systemPrompt } = await this.getState()
+		this.cline = new Cline(this, apiConfiguration, autoApprovalSettings, customInstructions, task, images, undefined, systemPrompt)
 	}
 
 	async initClineWithHistoryItem(historyItem: HistoryItem) {
 		await this.clearTask()
-		const { apiConfiguration, customInstructions, autoApprovalSettings } = await this.getState()
+		const { apiConfiguration, customInstructions, autoApprovalSettings, systemPrompt } = await this.getState()
 		this.cline = new Cline(
 			this,
 			apiConfiguration,
@@ -215,6 +219,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			undefined,
 			undefined,
 			historyItem,
+			systemPrompt,
 		)
 	}
 
@@ -473,7 +478,11 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						openImage(message.text!)
 						break
 					case "openFile":
-						openFile(message.text!)
+						let file = message.text
+						if (message.text === "{SystemPromptFile}") {
+							file = path.join(os.homedir(), ".cline", GlobalFileNames.systemPrompts)
+						}
+						openFile(file!)
 						break
 					case "openMention":
 						openMention(message.text)
@@ -511,6 +520,20 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 						}
 						break
 					}
+					case "loadSystemPrompts": {
+						const systemPrompts = await this.loadSystemPrompts()
+						await this.updateGlobalState("systemPrompts", systemPrompts)
+						await this.postStateToWebview()
+						break
+					}
+					case "updateSystemPrompt": {
+						console.log(`updateSystemPrompt ${JSON.stringify(message.systemPrompt)}`)
+						if (this.cline && message.systemPrompt) {
+							await this.updateGlobalState("systemPrompt", message.systemPrompt)
+							this.cline.systemPrompt = message.systemPrompt
+						}
+						break
+					}				
 					// Add more switch case statements here as more webview message commands
 					// are created within the webview context (i.e. inside media/main.js)
 				}
@@ -828,7 +851,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 	}
 
 	async getStateToPostToWebview() {
-		const { apiConfiguration, lastShownAnnouncementId, customInstructions, taskHistory, autoApprovalSettings } =
+		const { apiConfiguration, lastShownAnnouncementId, customInstructions, taskHistory, autoApprovalSettings, systemPrompts } =
 			await this.getState()
 		return {
 			version: this.context.extension?.packageJSON?.version ?? "",
@@ -839,6 +862,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			taskHistory: (taskHistory || []).filter((item) => item.ts && item.task).sort((a, b) => b.ts - a.ts),
 			shouldShowAnnouncement: lastShownAnnouncementId !== this.latestAnnouncementId,
 			autoApprovalSettings,
+			systemPrompts: systemPrompts || [],
 		}
 	}
 
@@ -923,6 +947,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			customInstructions,
 			taskHistory,
 			autoApprovalSettings,
+			systemPrompt,
+			systemPrompts
 		] = await Promise.all([
 			this.getGlobalState("apiProvider") as Promise<ApiProvider | undefined>,
 			this.getGlobalState("apiModelId") as Promise<string | undefined>,
@@ -952,6 +978,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			this.getGlobalState("customInstructions") as Promise<string | undefined>,
 			this.getGlobalState("taskHistory") as Promise<HistoryItem[] | undefined>,
 			this.getGlobalState("autoApprovalSettings") as Promise<AutoApprovalSettings | undefined>,
+			this.getGlobalState("systemPrompt") as Promise<SystemPrompt | undefined>,
+			this.getGlobalState("systemPrompts") as Promise<SystemPrompt[] | undefined>,
 		])
 
 		let apiProvider: ApiProvider
@@ -999,6 +1027,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			customInstructions,
 			taskHistory,
 			autoApprovalSettings: autoApprovalSettings || DEFAULT_AUTO_APPROVAL_SETTINGS, // default value can be 0 or empty string
+			systemPrompt,
+			systemPrompts,
 		}
 	}
 
@@ -1056,6 +1086,12 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 
 	private async getSecret(key: SecretKey) {
 		return await this.context.secrets.get(key)
+	}
+
+	private async loadSystemPrompts() {
+		const systemPrompts = await JSON.parse(await fs.readFile(
+			path.join(os.homedir(), ".cline", GlobalFileNames.systemPrompts), "utf8"))
+		return systemPrompts
 	}
 
 	// dev

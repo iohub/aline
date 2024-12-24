@@ -25,6 +25,8 @@ import ChatRow from "./ChatRow"
 import ChatTextArea from "./ChatTextArea"
 import TaskHeader from "./TaskHeader"
 import AutoApproveMenu from "./AutoApproveMenu"
+import SystemPromptPicker from "./SystemPromptPicker"
+import ModelPicker from "./ModelPicker"
 
 interface ChatViewProps {
 	isHidden: boolean
@@ -707,6 +709,10 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 		[expandedRows, modifiedMessages, groupedMessages.length, toggleRowExpansion, handleRowHeightChange],
 	)
 
+	// Add new state for dropdowns
+	const [selectedModel, setSelectedModel] = useState("Claude 3.5 Sonnet (New)")
+	const [selectedPrompt, setSelectedPrompt] = useState("Cline")
+
 	return (
 		<div
 			style={{
@@ -869,6 +875,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					)}
 				</>
 			)}
+	
 			<ChatTextArea
 				ref={textAreaRef}
 				inputValue={inputValue}
@@ -886,6 +893,43 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					}
 				}}
 			/>
+
+			<div style={{ display: "flex", flexDirection: "column" }}>
+				<div style={{
+					display: "flex",
+					padding: "8px 15px 0 15px", // Adjust padding to be closer to input
+					gap: "8px",
+					backgroundColor: "transparent",
+				}}>
+
+					<div style={{ 
+						height: "18px", 
+						width: "1px", 
+						backgroundColor: "var(--vscode-input-border)",
+						margin: "0 4px"
+					}} />
+
+					<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+						<SystemPromptPicker
+							selectedPrompt={selectedPrompt}
+							onSelect={setSelectedPrompt}
+						/>
+					</div>
+
+					<div style={{ 
+						height: "18px", 
+						width: "1px", 
+						backgroundColor: "var(--vscode-input-border)",
+						margin: "0 4px"
+					}} />
+
+					<ModelPicker
+						selectedModel={selectedModel}
+						onModelSelect={setSelectedModel}
+					/>
+				</div>
+			</div>
+
 		</div>
 	)
 }

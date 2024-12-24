@@ -1,5 +1,6 @@
 import { ApiConfiguration } from "./api"
 import { AutoApprovalSettings } from "./AutoApprovalSettings"
+import { SystemPrompt } from "./SystemPrompt"
 
 export interface WebviewMessage {
 	type:
@@ -26,12 +27,15 @@ export interface WebviewMessage {
 		| "openMcpSettings"
 		| "restartMcpServer"
 		| "autoApprovalSettings"
+		| "loadSystemPrompts"
+		| "updateSystemPrompt"
 	text?: string
 	askResponse?: ClineAskResponse
 	apiConfiguration?: ApiConfiguration
 	images?: string[]
 	bool?: boolean
 	autoApprovalSettings?: AutoApprovalSettings
+	systemPrompt?: SystemPrompt
 }
 
 export type ClineAskResponse = "yesButtonClicked" | "noButtonClicked" | "messageResponse"

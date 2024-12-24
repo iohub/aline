@@ -50,6 +50,7 @@ import { addUserInstructions, SYSTEM_PROMPT } from "./prompts/system"
 import { truncateHalfConversation } from "./sliding-window"
 import { ClineProvider, GlobalFileNames } from "./webview/ClineProvider"
 import { showSystemNotification } from "../integrations/notifications"
+import { CLINE_SYSTEM_PROMPT, SystemPrompt } from "../shared/SystemPrompt"
 
 const cwd =
 	vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath).at(0) ?? path.join(os.homedir(), "Desktop") // may or may not exist but fs checking existence would immediately ask for permission which would be bad UX, need to come up with a better solution
@@ -70,6 +71,7 @@ export class Cline {
 	autoApprovalSettings: AutoApprovalSettings
 	apiConversationHistory: Anthropic.MessageParam[] = []
 	clineMessages: ClineMessage[] = []
+	systemPrompt: SystemPrompt = CLINE_SYSTEM_PROMPT
 	private askResponse?: ClineAskResponse
 	private askResponseText?: string
 	private askResponseImages?: string[]
@@ -101,6 +103,7 @@ export class Cline {
 		task?: string,
 		images?: string[],
 		historyItem?: HistoryItem,
+		systemPrompt?: SystemPrompt
 	) {
 		this.providerRef = new WeakRef(provider)
 		this.api = buildApiHandler(apiConfiguration)
@@ -110,6 +113,7 @@ export class Cline {
 		this.diffViewProvider = new DiffViewProvider(cwd)
 		this.customInstructions = customInstructions
 		this.autoApprovalSettings = autoApprovalSettings
+		this.systemPrompt = systemPrompt ?? CLINE_SYSTEM_PROMPT
 		if (historyItem) {
 			this.taskId = historyItem.id
 			this.resumeTaskFromHistory()
@@ -800,8 +804,9 @@ export class Cline {
 		if (!mcpHub) {
 			throw new Error("MCP hub not available")
 		}
-
-		let systemPrompt = await SYSTEM_PROMPT(cwd, this.api.getModel().info.supportsComputerUse ?? false, mcpHub)
+		let systemPrompt = this.systemPrompt.id.toLowerCase() === "cline" ?
+			await SYSTEM_PROMPT(cwd, this.api.getModel().info.supportsComputerUse ?? false, mcpHub) :
+			this.systemPrompt.prompt
 		let settingsCustomInstructions = this.customInstructions?.trim()
 		const clineRulesFilePath = path.resolve(cwd, GlobalFileNames.clineRules)
 		let clineRulesFileInstructions: string | undefined
