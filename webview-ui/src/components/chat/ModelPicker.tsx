@@ -22,7 +22,7 @@ const ModelPicker = ({ selectedModel, onModelSelect }: ModelPickerProps) => {
     { id: 'gpt4o', name: 'GPT-4o' },
     { id: 'llama-70b-free', name: 'Llama3.1 70b' },
     { id: 'codestral-free', name: 'Codestral' },
-    { id: 'claude-3-sonnet', name: 'Claude 3.5 Sonnet', status: 'Missing API key' },
+    { id: 'claude-3-sonnet', name: 'Claude 3.5 Sonnet' },
   ]
 
   useEffect(() => {
