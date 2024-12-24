@@ -842,7 +842,7 @@ export class Cline {
 				}
 			}
 		}
-
+		console.log(`systemPrompt ${systemPrompt}`)
 		const stream = this.api.createMessage(systemPrompt, this.apiConversationHistory)
 		const iterator = stream[Symbol.asyncIterator]()
 

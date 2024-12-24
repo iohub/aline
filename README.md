@@ -9,7 +9,7 @@ Meet Cline, an AI assistant that can use your **CLI** a**N**d **E**ditor.
 
 ### Post-fork Features
 * Auto approve all operations
-* Customize system prompts (.cursorrules)
+* Customize system prompts
 
 > [!TIP]
 > Use the `CMD/CTRL + Shift + P` shortcut to open the command palette and type "Cline: Open In New Tab" to open the extension as a tab in your editor. This lets you use Cline side-by-side with your file explorer, and see how he changes your workspace more clearly.
